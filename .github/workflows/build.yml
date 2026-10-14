@@ -19,9 +19,11 @@ jobs:
       - run: tools/dist.sh ${TAG:+"$TAG"}
         env:
           TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+      - id: zip
+        run: echo "name=$(basename dist/*.zip .zip)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
-          name: csgo-steam-reconnect
+          name: ${{ steps.zip.outputs.name }}
           path: build/dist/
       - if: github.ref_type == 'tag'
         run: gh release create "$GITHUB_REF_NAME" dist/*.zip --generate-notes
