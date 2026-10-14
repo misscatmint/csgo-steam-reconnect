@@ -5,7 +5,7 @@
 #include <string.h>
 #include <time.h>
 
-#define PLUGIN_VERSION "0.1.0"
+#define PLUGIN_VERSION "1.0.0"
 #define PLUGIN_NAME "csgo-steam-reconnect v" PLUGIN_VERSION
 #define PLUGIN_EXPORT extern "C" __attribute__((visibility("default")))
 #define LOG_PREFIX "csgo-steam-reconnect: "
