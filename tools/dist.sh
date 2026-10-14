@@ -2,7 +2,8 @@
 # Builds a release from scratch into
 # dist/csgo-steam-reconnect-v<version>-linux.zip, holding addons/ the way it
 # goes into a server's csgo/ folder. Warnings and shellcheck findings fail the
-# build. Given a tag, also fails unless it matches PLUGIN_VERSION.
+# build. Given a tag, also fails unless it matches PLUGIN_VERSION. Besides what
+# make needs, it needs zip and shellcheck.
 
 set -Eeuo pipefail
 

@@ -1,4 +1,4 @@
-# Extra flags can be added with make CXXFLAGS=..., which these don't depend on.
+# make CXXFLAGS=... adds to these flags instead of replacing them.
 PLUGIN_CXXFLAGS = -m32 -O2 -fPIC -fvisibility=hidden -fno-exceptions -fno-rtti \
                   -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wconversion \
                   -Wsign-conversion

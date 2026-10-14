@@ -63,10 +63,6 @@ int64_t Now() {
     return ts.tv_sec;
 }
 
-// Only acts on a server that is meant to be on Steam: one it has seen logged
-// on, or one it was loaded onto at runtime while logged off. A server that
-// never logs on, like a LAN server, is left alone. So is a login token server,
-// since re-logging it on anonymously would drop its token.
 bool g_armed;
 bool g_tokenServer;
 int64_t g_lastCheck;
@@ -82,9 +78,12 @@ void ResetOffline() {
     g_logOns = 0;
 }
 
-// The account type comes from the engine's logon call, before the server even
-// connects, and can't change until a restart. An ID with no type yet means the
-// engine hasn't called it, so the decision waits.
+// Arms only for a server that logs on to Steam anonymously. The account type
+// comes from the engine's logon call, before the server even connects, and
+// can't change until a restart. An ID with no type yet means the engine hasn't
+// made that call, so the decision waits, and a server that never makes it, like
+// a LAN server, is left alone. So is a login token server, since logging it
+// back in anonymously would drop its token.
 void TryArm(ISteamGameServer *server) {
     if (g_armed || g_tokenServer)
         return;

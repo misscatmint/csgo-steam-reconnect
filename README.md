@@ -33,5 +33,5 @@ with `plugin_load addons/csgo-steam-reconnect`.
 ```sh
 make                  # needs g++ with 32-bit support (g++-multilib)
 make CXX=clang++      # or clang
-tools/dist.sh [tag]   # release zip in dist/
+tools/dist.sh [tag]   # release zip in dist/ (needs zip, shellcheck)
 ```
