@@ -13,7 +13,9 @@ jobs:
       contents: write # publishing releases for tags
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y g++-multilib zip
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-multilib zip shellcheck
       - run: tools/dist.sh ${TAG:+"$TAG"}
         env:
           TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}

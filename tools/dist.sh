@@ -1,8 +1,8 @@
 #!/bin/bash
 # Builds a release from scratch into
 # dist/csgo-steam-reconnect-v<version>-linux.zip, holding addons/ the way it
-# goes into a server's csgo/ folder. Warnings fail the build. Given a tag, also
-# fails unless it matches PLUGIN_VERSION.
+# goes into a server's csgo/ folder. Warnings and shellcheck findings fail the
+# build. Given a tag, also fails unless it matches PLUGIN_VERSION.
 
 set -Eeuo pipefail
 
@@ -24,6 +24,7 @@ if [[ $# -eq 1 && $1 != "v$version" ]]; then
 fi
 
 make clean
+make lint
 make CXXFLAGS=-Werror
 
 staging=build/dist

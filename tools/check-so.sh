@@ -21,7 +21,7 @@ fi
 
 needed=$(readelf -d "$so" | sed -n 's/.*(NEEDED).*\[\(.*\)\]/\1/p')
 for lib in $needed; do
-    if [[ ! " ${allowed[*]} " =~ " $lib " ]]; then
+    if [[ " ${allowed[*]} " != *" $lib "* ]]; then
         echo "$so depends on $lib, which isn't in the allowed list" >&2
         exit 1
     fi
