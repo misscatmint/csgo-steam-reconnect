@@ -11,8 +11,10 @@ allowed=(libtier0.so libsteam_api.so libc.so.6)
 
 so=$1
 
-newest=$(objdump -T "$so" | grep -o 'GLIBC_[0-9.]*' | sed 's/^GLIBC_//' | sort -uV | tail -1)
-if [[ $(printf '%s\n' "$newest" "$max_glibc" | sort -V | tail -1) != "$max_glibc" ]]; then
+newest=$(objdump -T "$so" | grep -o 'GLIBC_[0-9.]*' | sed 's/^GLIBC_//' |
+    sort -uV | tail -1)
+higher=$(printf '%s\n' "$newest" "$max_glibc" | sort -V | tail -1)
+if [[ $higher != "$max_glibc" ]]; then
     echo "$so needs glibc $newest, newer than $max_glibc" >&2
     exit 1
 fi

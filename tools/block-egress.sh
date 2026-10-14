@@ -16,7 +16,8 @@ Blocks all outgoing IPv4 traffic from <container-ip> until Ctrl-C, or for
 [seconds]. Make sure it's the test container's IP. If it belongs to another
 container, that one gets cut off instead.
 Find the IP with:
-  docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container>
+  docker inspect <container> \\
+      -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
 EOF
     exit 2
 }
@@ -47,7 +48,8 @@ fi
 # A leftover table means an earlier run didn't clean up, or something else
 # owns the name. Deleting it here could remove rules this run didn't create.
 if nft list table inet "$table" >/dev/null 2>&1; then
-    echo "table inet $table already exists. Remove it with: nft delete table inet $table" >&2
+    echo "table inet $table already exists. Remove it with:" >&2
+    echo "  nft delete table inet $table" >&2
     exit 1
 fi
 

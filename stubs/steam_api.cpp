@@ -3,8 +3,7 @@
 
 #include <stdint.h>
 
-extern "C"
-{
+extern "C" {
 int32_t SteamGameServer_GetHSteamPipe() { return 0; }
 void *SteamAPI_SteamGameServer_v014() { return 0; }
 bool SteamAPI_ISteamGameServer_BLoggedOn(void *) { return false; }
