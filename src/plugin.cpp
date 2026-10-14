@@ -64,15 +64,6 @@ unsigned AccountType(uint64_t steamID)
 	return (steamID >> 52) & 0xF;
 }
 
-// Prints the ID the way steamclient's logs and the console do, e.g. [A:1:123:45].
-void LogSteamID(const char *message, uint64_t steamID)
-{
-	const unsigned type = AccountType(steamID);
-	const char letter = type == kAccountTypeAnonGameServer ? 'A' : type == kAccountTypeGameServer ? 'G' : '?';
-	Msg(LOG_PREFIX "%s [%c:%u:%u:%u]\n", message, letter,
-		(unsigned)(steamID >> 56), (unsigned)(steamID & 0xFFFFFFFF), (unsigned)((steamID >> 32) & 0xFFFFF));
-}
-
 int64_t Now()
 {
 	timespec ts;
@@ -108,16 +99,15 @@ void TryArm(ISteamGameServer *server)
 	if (g_armed || g_tokenServer)
 		return;
 
-	const uint64_t steamID = SteamAPI_ISteamGameServer_GetSteamID(server);
-	switch (AccountType(steamID))
+	switch (AccountType(SteamAPI_ISteamGameServer_GetSteamID(server)))
 	{
 	case kAccountTypeAnonGameServer:
 		g_armed = true;
-		LogSteamID("armed for anonymous server", steamID);
+		Msg(LOG_PREFIX "watching the server's steam connection\n");
 		break;
 	case kAccountTypeGameServer:
 		g_tokenServer = true;
-		LogSteamID("not arming, this server uses a login token (GSLT), which isn't supported", steamID);
+		Msg(LOG_PREFIX "this server logs in with a login token (GSLT) which isn't supported, so doing nothing\n");
 		break;
 	default:
 		break;
@@ -139,8 +129,8 @@ void Check()
 	{
 		if (g_off)
 		{
-			Msg(LOG_PREFIX "back on Steam after %lld seconds, %d re-logon(s) by this plugin\n",
-				(long long)(now - g_offSince), g_logOns);
+			Msg(LOG_PREFIX "back on steam after %lld seconds (logged back in %d time%s)\n",
+				(long long)(now - g_offSince), g_logOns, g_logOns == 1 ? "" : "s");
 		}
 		ResetOffline();
 		TryArm(server);
@@ -155,9 +145,8 @@ void Check()
 		g_off = true;
 		g_offSince = now;
 		g_nextLogOn = now + g_delay;
-		Msg(LOG_PREFIX "not logged on to Steam, re-logging on in %lld seconds if it stays that way\n",
+		Msg(LOG_PREFIX "lost the steam connection, logging back in after %lld seconds (unless it recovers)\n",
 			(long long)g_delay);
-		LogSteamID("while logged off, the server's Steam ID reads", SteamAPI_ISteamGameServer_GetSteamID(server));
 		return;
 	}
 
@@ -169,7 +158,7 @@ void Check()
 	// own state, which would drop a login token server's token.
 	SteamAPI_ISteamGameServer_LogOnAnonymous(server);
 	++g_logOns;
-	Msg(LOG_PREFIX "re-logging on to Steam (attempt %d, off for %lld seconds)\n",
+	Msg(LOG_PREFIX "logging back in to steam (attempt %d, offline for %lld seconds)\n",
 		g_logOns, (long long)(now - g_offSince));
 
 	g_delay = g_delay * 2 < kMaxDelay ? g_delay * 2 : kMaxDelay;
@@ -190,22 +179,11 @@ public:
 		g_lastCheck = 0;
 		ResetOffline();
 
-		ISteamGameServer *server = EngineGameServer();
-		if (!server)
-		{
-			Msg(LOG_PREFIX "v" PLUGIN_VERSION " loaded, the engine hasn't set up Steam yet\n");
-		}
-		else if (SteamAPI_ISteamGameServer_BLoggedOn(server))
-		{
-			Msg(LOG_PREFIX "v" PLUGIN_VERSION " loaded, the server is logged on to Steam\n");
+		Msg(LOG_PREFIX "v" PLUGIN_VERSION " loaded\n");
+		// Arms even when the server is off Steam right now, since being loaded by
+		// hand onto a stuck server to fix it is the point.
+		if (ISteamGameServer *server = EngineGameServer())
 			TryArm(server);
-		}
-		else
-		{
-			// Loaded by hand onto a server that's off Steam, presumably to fix it.
-			Msg(LOG_PREFIX "v" PLUGIN_VERSION " loaded, the server is NOT logged on to Steam\n");
-			TryArm(server);
-		}
 		return true;
 	}
 

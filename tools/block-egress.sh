@@ -1,7 +1,8 @@
 #!/bin/bash
 # Cuts a test container off from the internet until interrupted or for a set
 # number of seconds, then removes the block. Used to make srcds lose its Steam
-# connection on demand. Run as root on the Docker host.
+# connection on demand. That reproduces an ordinary outage, not the stuck state
+# csgo-steam-reconnect fixes. Run as root on the Docker host.
 
 set -Eeuo pipefail
 
@@ -11,7 +12,9 @@ usage() {
     cat >&2 <<EOF
 usage: $0 <container-ip> [seconds]
 
-Blocks all outgoing traffic from <container-ip> until Ctrl-C, or for [seconds].
+Blocks all outgoing IPv4 traffic from <container-ip> until Ctrl-C, or for
+[seconds]. Make sure it's the test container's IP. If it belongs to another
+container, that one gets cut off instead.
 Find the IP with:
   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container>
 EOF
