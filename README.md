@@ -79,12 +79,25 @@ make                # build with g++
 make CXX=clang++    # or with clang
 ```
 
-The version is `PLUGIN_VERSION` in `src/plugin.cpp`.
+The plugin ends up in `build/`. The version is `PLUGIN_VERSION` in
+`src/plugin.cpp`.
 
-The plugin ends up in `build/`. It needs glibc 2.17, one version above the
-game's own 2.15, so it runs on Steam Runtime 3 (sniper, glibc 2.31) and on any
-distro from the last decade. The build checks this, and fails if a toolchain
-would produce something that needs a newer glibc or extra libraries.
+## Releasing
+
+`tools/dist.sh` builds a release from scratch, treating warnings as errors, and
+packages it as `dist/csgo-steam-reconnect-v<version>-linux.zip`, with an
+`addons/` folder to extract into the server's `csgo/` folder. Given a tag, as in
+`tools/dist.sh v0.1.0`, it also checks that the tag matches `PLUGIN_VERSION`.
+
+GitHub Actions runs the same script on every push and pull request, and
+publishes the zip as a release when a `v*` tag is pushed.
+
+## Compatibility
+
+The plugin needs glibc 2.17, one version above the game's own 2.15, so it runs
+on Steam Runtime 3 (sniper, glibc 2.31) and on any distro from the last decade.
+The build checks this, and fails if a toolchain would produce something that
+needs a newer glibc or extra libraries.
 
 ## Limitations
 
